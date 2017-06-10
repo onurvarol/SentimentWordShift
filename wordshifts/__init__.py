@@ -75,7 +75,7 @@ class Sentiment(object):
     '''
     Peter Dodds's happiness words
     '''
-    def happinessScore(self, text, includeWordCounts=False):
+    def happinessScore(self, text, includeWordCounts=False, includeDistributions=False):
         wordCounts = dict()
         for w in self.happinessScores:
             if not (self.config.get('happinessMin', 4.) < self.happinessScores[w]['happiness_mean'] < self.config.get('happinessMax', 6.)):
@@ -99,15 +99,17 @@ class Sentiment(object):
                 continue
             happiness['happiness_mean'] += (wordCounts[w]/sumWords) * self.happinessScores[w]['happiness_mean']
             happiness['happiness_std'] += (wordCounts[w]/sumWords) * pow(self.happinessScores[w]['happiness_std'],2)
-            for i,d in enumerate(xbins):
-                dpdf = self._normPdf(d,self.happinessScores[w]['happiness_mean'],
-                                      self.happinessScores[w]['happiness_std'])
 
-                happiness['happiness_distribution'][i][1] += dpdf * (wordCounts[w] / sumWords)
+            if includeDistributions:
+                for i,d in enumerate(xbins):
+                    dpdf = self._normPdf(d,self.happinessScores[w]['happiness_mean'],
+                                          self.happinessScores[w]['happiness_std'])
+
+                    happiness['happiness_distribution'][i][1] += dpdf * (wordCounts[w] / sumWords)
 
         return happiness
 
-    def anewScore(self, text, includeWordCounts=False):
+    def anewScore(self, text, includeWordCounts=False, includeDistributions=False):
         wordCounts = dict()
         for w in self.anewScores:
             wordCounts[w] = 0
@@ -133,11 +135,12 @@ class Sentiment(object):
                 anew['{}_mean'.format(t)] += (wordCounts[w]/sumWords) * self.anewScores[w]['{}_mean'.format(t)]
                 anew['{}_std'.format(t)] += (wordCounts[w]/sumWords) * pow(self.anewScores[w]['{}_std'.format(t)],2)
 
-                for i,d in enumerate(xbins):
-                    dpdf = self._normPdf(d,self.anewScores[w]['{}_mean'.format(t)],
-                                          self.anewScores[w]['{}_std'.format(t)])
+                if includeDistributions:
+                    for i,d in enumerate(xbins):
+                        dpdf = self._normPdf(d,self.anewScores[w]['{}_mean'.format(t)],
+                                              self.anewScores[w]['{}_std'.format(t)])
 
-                    anew['{}_distribution'.format(t)][i][1] += dpdf * (wordCounts[w] / sumWords)
+                        anew['{}_distribution'.format(t)][i][1] += dpdf * (wordCounts[w] / sumWords)
         return anew
 
 
