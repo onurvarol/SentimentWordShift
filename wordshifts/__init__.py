@@ -59,14 +59,14 @@ class Sentiment(object):
         self.happinessScores = self.__loadHappinessData()
         self.anewScores = self.__loadANEWData()
 
-    def compute(self,text, methods=None, includeWordCounts=False):
+    def compute(self,text, methods=None, includeWordCounts=False, includeDistributions=False):
         if methods == None:
             methods = ['happiness', 'anew']
         senti = dict()
         if 'happiness' in methods:
-            senti.update(self.happinessScore(text, includeWordCounts))
+            senti.update(self.happinessScore(text, includeWordCounts, includeDistributions))
         if 'anew' in methods:
-            senti.update(self.anewScore(text, includeWordCounts))
+            senti.update(self.anewScore(text, includeWordCounts, includeDistributions))
         return senti
 
     def _normPdf(self, xVal, meanV=0, stdV=1):
